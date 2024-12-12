@@ -1,12 +1,19 @@
 package com.masorange.tecnictest.api
 
-import com.masorange.tecnictest.api.models.ImageImgur
+import android.graphics.Bitmap
+import com.masorange.tecnictest.api.models.ImgurRequest
+import com.masorange.tecnictest.api.models.ImgurUploadResponse
+import okhttp3.MultipartBody
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.Multipart
 import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.Part
+import retrofit2.http.Path
 
 
 // Images
@@ -17,10 +24,15 @@ import retrofit2.http.Query
 interface ApiService{
 
     @GET("https://api.imgur.com/3/account/me/images")
-    suspend fun getMyImages(@Header("Authorization") header: String): List<ImageImgur>
+    suspend fun getMyImages(@Header("Authorization") header: String): ImgurRequest
 
-    @POST("https://api.imgur.com/oauth2/authorize")
-    suspend fun getAccesToken(@Query("client_id") clientId: String, @Query("response_type") responseType: String)
+    @Multipart
+    @POST("3/image")
+    suspend fun uploadImage(@Header("Authorization") authorization: String, @Part image: MultipartBody.Part): Response<ImgurUploadResponse>
+
+    @DELETE("https://api.imgur.com/3/account/{username}/image/{deleteHash}")
+    suspend fun deleteImage(@Header("Authorization") authorization: String, @Path("username") username:String, @Path("deleteHash") deleteHash:String): Response<ImgurUploadResponse>
+
 }
 
 fun createImgurApi(accessToken: String): ApiService {
